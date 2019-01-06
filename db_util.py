@@ -10,7 +10,10 @@ class NewDb_util:
             "notyomama.com":"76.165.22.8",
             "howtotieyourshoes.com":"42.99.132.22",
             "moonpenguins.hurrdurr":"over 9000",
-            "t":"1"#for testing
+            "t":"1"
+# =============================================================================
+# t:1 -  for testing
+# =============================================================================
         }
         self.undefiendCounter=0
    
@@ -39,9 +42,13 @@ class NewDb_util:
             if ip!=False: self.db[domain]=ip
             else: self.db[domain]="[NOIP]"
             return "Entry added succesfully!"
-        #when no error occurs it alreadt exists
+# =============================================================================
+# when no error occurs it alreadt exists
+# =============================================================================
         return "ERROR! Hostname already exist"
-    #creates a new entry with only an IP in value spot of map
+# =============================================================================
+# creates a new entry with only an IP in value spot of map
+# =============================================================================
     def setIp(self,ip):
         found=False
         for k,v in self.db.items():
@@ -50,10 +57,14 @@ class NewDb_util:
                 found=True
                 print("IP FOUND %s"%v)
                 break
-        #only add if not found
+# =============================================================================
+# only add if not found
+# =============================================================================
         if not found:
             while 1:
-                #cant create domain ip value due to map structure, so set domain to something uninportant
+# =============================================================================
+# cant create domain ip value due to map structure, so set domain to something uninportant
+# =============================================================================
                 try:
                     self.db["[NODOMAIN%s]"%str(self.undefiendCounter)]=ip
                     break
@@ -61,26 +72,40 @@ class NewDb_util:
             return "Ip added succesfully!"
         else: return "ERROR! ip already exists"
     def setDomain(self,domain):
-        #excepts if it already exists
+# =============================================================================
+# excepts if it already exists
+# =============================================================================
         try: self.db[domain]
-        #create new entry
+# =============================================================================
+# create new entry
+# =============================================================================
         except:
             self.db[domain]="[NOIP]"
-            #inform
+# =============================================================================
+# inform
+# =============================================================================
             return "Hostname added succesfully!"
-        #inform user
+# =============================================================================
+# inform user
+# =============================================================================
         return "ERROR! domain already exist"
     def getIp(self,domain):
         try: return self.db[domain]
         except: return "ERROR! hostname not found"
-    #changes the ip on an already existing entry
+# =============================================================================
+# changes the ip on an already existing entry
+# =============================================================================
     def changeIp(self,domain,ip):
         try: 
             if self.db[domain]: self.db[domain]=ip
-        #excepts if domain doesnt exist
+# =============================================================================
+# excepts if domain doesnt exist
+# =============================================================================
         except:
             return "ERROR! Hostname doesn't exist"
-    #changes the domain on an already entry, via ip value
+# =============================================================================
+# changes the domain on an already entry, via ip value
+# =============================================================================
     def changeDomain(self,domain,ip):
         changed=False
         for key,val in self.db.items():
@@ -92,7 +117,9 @@ class NewDb_util:
             return "changed domain for ip \"%s\" to \"%s\"" %(ip,domain)
         else: return "FAIL - ip \"%s\" doesnt exist" % ip
 
-#DEBUG TEST
+# =============================================================================
+# DEBUG TEST
+# =============================================================================
 try:
     if os.environ["debug"]==1:
         db=NewDb_util()
@@ -109,6 +136,8 @@ try:
         print(db.getIp("bananas.com"))
         print("TEST END")
 except: pass
-#END DEBUG
+# =============================================================================
+# END DEBUG
+# =============================================================================
 
 

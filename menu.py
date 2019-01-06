@@ -1,4 +1,7 @@
-from urllib.request import urlopen,Request #used by the menu to interact with dns server
+from urllib.request import urlopen,Request 
+# =============================================================================
+# used by the menu to interact with dns server
+# =============================================================================
 # =============================================================================
 # start infinite loop to serve user
 # =============================================================================
