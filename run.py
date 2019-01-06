@@ -1,35 +1,80 @@
 #!/usr/local/bin/python3.7
-#if i missed to remove a #debug, please do :) and REMOVE THIS :D
 from flask import Flask #import the framework
-from werkzeug.serving import run_simple #needed so that threading will recognize threaded as an valid option in kwargs
 import threading #handles the concurrency
-from sys import platform #to check what OS is running #NOT NEEDED?
-from os import system #to start mysql #NOT NEEDED?
 import server #import the server functionality
-import atexit #used to stop mysql server, when program is finished #NOT NEEDED?
-#NOT NEEDED ?
-#function that will stop mysql server
-def finished():
-    system("SAME PATH AS ABOVE -u root shutdown")
-#start mysql server - might crash if its already running?
-if platform=="win32":
-    #https://dev.mysql.com/doc/refman/5.7/en/windows-start-command-line.html #REMOVE THIS - intentional bug
-    system("THIS NEEDS TO BE THE POSITION OF MYSQL SERVER")
-atexit.register(finished) #register it - so it runs when program is finished
-#END NOT NEEDED
-#create flask app and routes
+import time
+# =============================================================================
+# #create flask app and routes
+# =============================================================================
 app=Flask("dns_server")
-#this route is for getting ip from domain, takes 1 argument, domain - only alows get requests
+app.debug=False
+app.use_reloader=False
+# =============================================================================
+#  this needs to be true if tests should be run
+# =============================================================================
+debug=False
+# =============================================================================
+# #this route is for getting ip from domain, takes 1 argument, domain - only alows get requests
+# =============================================================================
 @app.route("/get/ip/<string:domain>",methods=["GET"])
 def getIp(domain):
     return server.getIp(domain)
 #this route is for setting ip, takes 2 arguments, domain and ip - only allows post request
-@app.route("/set/ip/<string:domain>/<string:ip>",methods=["POST"])
-def setIp(domain,ip):
-    return server.setIp(domain,ip)
+@app.route("/change/ip/<string:domain>/<string:ip>",methods=["POST"])
+def changeIp(domain,ip):
+    return server.changeIp(domain,ip)
 #this route is for setting domain, takes 2 arguments, domain and ip - only allows post request
-@app.route("/set/domain/<string:domain>/<string:ip>",methods=["POST"])
-def setDomain(domain,ip):
-    return server.setDomain(domain,ip)
-#start flask app
-app.run(threaded=True,port=3000)
+@app.route("/change/domain/<string:domain>/<string:ip>",methods=["POST"])
+def changeDomain(domain,ip):
+    return server.changeDomain(domain,ip)
+#this route is for creating new entry, takes 2 arguments, domain and ip - only allows post request
+@app.route("/create/<string:domain>/<string:ip>",methods=["POST"])
+def createNewEntry(domain,ip):
+    return server.createNewEntry(domain,ip)
+#this route is for setting domain , takes 1 arguments, domain - only allows post request
+@app.route("/set/domain/<string:domain>",methods=["POST"])
+def setDomain(domain):
+    return server.setDomain(domain)
+#this route is for setting ip , takes 1 arguments, ip - only allows post request
+@app.route("/set/ip/<string:ip>",methods=["POST"])
+def setIp(ip):
+    return server.setIp(ip)
+#if tests are to be run
+if debug:
+    threading.Thread(target=app.run,daemon=True).start()
+    time.sleep(1)#so output doesnt mix
+    print("\n\n")
+#so we dont start server twice
+flaskRunning=False
+#loop for admin
+while True and not debug:
+    print("\n")
+    print("Server-Adminstrator Menu:")
+    print("a. Set new domain and IP")
+    print("b. Print DNS table")
+    print("c. Activate the server - listening to requests")
+    inp=input("What would you like to do? (a,b,c): ")
+    #create new domain + ip link
+    if inp=="a":
+        print(server.createNewEntry(input("New domain: "),input("Associated ip: ")))
+    #print database
+    elif inp=="b":
+        print("printing databse...")
+        print(server.printDb())
+    #start server
+    elif inp=="c":
+        if not flaskRunning:
+            flaskRunning=True
+            #start server as a thread + daemon
+            threading.Thread(target=app.run,daemon=True).start()
+            time.sleep(1)#so output doesnt mix
+            #logging
+            print("\n\n")
+            print("server running")
+        #dont start twice
+        else:
+            print("server already running")
+    #in case yall cant spell correctly
+    else:
+        print("incorrect input: %s" % inp)
+    time.sleep(1)#so output doesnt mix
