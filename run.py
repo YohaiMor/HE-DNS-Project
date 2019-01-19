@@ -1,10 +1,16 @@
 #!/usr/local/bin/python3.7
 from flask import Flask #import the framework
+from flask import Response
 import threading #handles the concurrency
 import server #import the server functionality
 import time
 # =============================================================================
-# #create flask app and routes
+# create flask app and routes
+# 
+# 1. Open an app using flask framework
+# 2. just tell the Flask app we are not in debug mode
+# 3. app.debug = False - like a bootApp: once you make changes you don't need to restart the app
+#    so now some functions in Flask frame work won't be able to work
 # =============================================================================
 app=Flask("dns_server")
 app.debug=False
@@ -12,13 +18,24 @@ app.use_reloader=False
 # =============================================================================
 #  this needs to be true if tests should be run
 # =============================================================================
-debug=True
+debug=False
+
+
+# =============================================================================
+# @app.route above class or function which mean a registeration functions in our Flask App
+# and attach it with http route
+# =============================================================================
 # =============================================================================
 # #this route is for getting ip from domain, takes 1 argument, domain - only alows get requests
 # =============================================================================
 @app.route("/get/ip/<string:domain>",methods=["GET"])
 def getIp(domain):
-    return server.getIp(domain)
+    [rc, ipData] = server.getIp(domain)
+    print ("status   =   " +str(rc))
+    print ("ipData = " +str(ipData))
+    print ("domain = " +str(domain))
+    jsonResponse = '[{"text" : "' + domain +'","url": "http://' +ipData +'"}]'
+    return Response(jsonResponse, status = rc, mimetype = 'application/json')
 # =============================================================================
 # this route is for setting ip, takes 2 arguments, domain and ip - only allows post request
 # =============================================================================
@@ -52,17 +69,22 @@ def setIp(ip):
 # =============================================================================
 # if tests are to be run
 # =============================================================================
+# =============================================================================
+# Our code divide to 2 parts: Test Part with debug = TRUE and Server Part with debug = FALSE
+# But since we need to run the tests we need to eun it with a thread but without the server!!
+# so we create only one thread for the tests!  
+# =============================================================================
 if debug:
     threading.Thread(target=app.run,daemon=True).start()
     time.sleep(1)#so output doesnt mix
     print("\n\n")
 
 flaskRunning=False
-ActivateLoop = True
+stopped=False
 # =============================================================================
 # loop for admin
 # =============================================================================
-while ActivateLoop and not debug:
+while not stopped and not debug:
 # =============================================================================
 # here we have a menu for the admin who response on the server
 # =============================================================================
@@ -84,32 +106,34 @@ while ActivateLoop and not debug:
         print("printing databse...")
         print(server.printDb())
 # =============================================================================
-# start server
+# start server - multithreading option
 # =============================================================================
     elif inp=="c":
         if not flaskRunning:
             flaskRunning=True
             #start server as a thread + daemon
-            threading.Thread(target=app.run,daemon=True).start()
+            threading.Thread(target=app.run("0.0.0.0"),daemon=True).start()
             time.sleep(1)#so output doesnt mix
 # =============================================================================
 #logging
 # =============================================================================
             print("\n\n")
             print("server running")
+            
+        else:
+            print("server already running") 
+
+
+    
+    elif inp=="exit":
+        stopped=True
 # =============================================================================
 #dont start twice
 # =============================================================================
-        else:
-            print("server already running")
-            
-            
-    elif inp=="exit":
-         ActivateLoop=False
-         
+
 # =============================================================================
 # in case cant spell correctly
-# ============================================================================= 
+# =============================================================================
     else:
         print("incorrect input: %s" % inp)
     time.sleep(1)
