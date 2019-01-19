@@ -33,10 +33,6 @@ class NewDb_util:
 # #to create any entity combained domain and IP
 # =============================================================================
     def createNewEntry(self,domain,ip):
-        try:
-            print(self.db[domain])
-        except:
-            print("couldnt print domain ip")
         try: self.db[domain]
         except:
             if ip!=False: self.db[domain]=ip
