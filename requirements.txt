@@ -1,3 +1,2 @@
-DNS_Server
-PyMySQL==0.9.2
-Flask==1.0.2
+flask=1.0.2=py37_1
+urllib3=1.23=py37_0
