@@ -1,5 +1,7 @@
 import os #check environment var for debug
 import re
+import json
+
 from db_util import NewDb_util
 # =============================================================================
 # #db=Db_util(host="localhost",user="root",db="dns")
@@ -42,7 +44,9 @@ def setIp(ip):
 # =============================================================================
 def getIp(domain):
     if validateDomain(domain):
-        return db.getIp(domain)
+        ip = db.getIp(domain)
+        result = json.dumps([ip])
+        return result
 # =============================================================================
 # #crate new domain + ip link
 # =============================================================================
