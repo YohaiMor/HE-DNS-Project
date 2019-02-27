@@ -1,9 +1,11 @@
 #!/usr/local/bin/python3.7
 from flask import Flask #import the framework
 from flask import Response
+
 import threading #handles the concurrency
 import server #import the server functionality
 import time
+import json
 # =============================================================================
 # create flask app and routes
 # 
@@ -30,12 +32,12 @@ debug=False
 # =============================================================================
 @app.route("/get/ip/<string:domain>",methods=["GET"])
 def getIp(domain):
-    [rc, ipData] = server.getIp(domain)
-    print ("status   =   " +str(rc))
+    ipData = server.getIp(domain)
+    #print ("status   =   " +str(rc))
     print ("ipData = " +str(ipData))
     print ("domain = " +str(domain))
-    jsonResponse = '[{"text" : "' + domain +'","url": "http://' +ipData +'"}]'
-    return Response(jsonResponse, status = rc, mimetype = 'application/json')
+    jsonResponse = json.dumps([ipData[1]])
+    return jsonResponse
 # =============================================================================
 # this route is for setting ip, takes 2 arguments, domain and ip - only allows post request
 # =============================================================================

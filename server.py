@@ -45,8 +45,7 @@ def setIp(ip):
 def getIp(domain):
     if validateDomain(domain):
         ip = db.getIp(domain)
-        result = json.dumps([ip])
-        return result
+        return ip
 # =============================================================================
 # #crate new domain + ip link
 # =============================================================================
