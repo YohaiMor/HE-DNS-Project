@@ -10,6 +10,7 @@ class NewDb_util:
             "notyomama.com":"76.165.22.8",
             "howtotieyourshoes.com":"42.99.132.22",
             "moonpenguins.hurrdurr":"over 9000",
+            "google.co.il":"172.217.18.163",
             "t":"1"
 # =============================================================================
 # t:1 -  for testing
@@ -86,8 +87,8 @@ class NewDb_util:
 # =============================================================================
         return "ERROR! domain already exist"
     def getIp(self,domain):
-        try: return self.db[domain]
-        except: return "ERROR! hostname not found"
+        try: return [200,self.db[domain]]
+        except: return [404,"0.0.0.0"]
 # =============================================================================
 # changes the ip on an already existing entry
 # =============================================================================
